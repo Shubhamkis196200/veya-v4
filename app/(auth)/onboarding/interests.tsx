@@ -143,7 +143,7 @@ const borderRadius = {
 // ─────────────────────────────────────────────────────────────
 
 const { width: SCREEN_WIDTH, height: SCREEN_HEIGHT } = Dimensions.get('window');
-const TOTAL_STEPS = 10;
+const TOTAL_STEPS = 9;
 const CURRENT_STEP = 9; // 0-indexed: step 9 of 10 (ALL dots filled — last screen!)
 
 // Grid layout
@@ -647,7 +647,7 @@ function ShimmerOverlay() {
 function BurstParticle({
   angle, distance, size, burstProgress,
 }: {
-  angle: number; distance: number; size: number; burstProgress: Animated.SharedValue<number>;
+  angle: number; distance: number; size: number; burstProgress: { value: number };
 }) {
   const particleStyle = useAnimatedStyle(() => {
     const progress = burstProgress.value;

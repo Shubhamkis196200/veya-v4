@@ -83,7 +83,7 @@ const spacing = { xs: 8, sm: 12, md: 16, lg: 24, xl: 32, xxl: 48 } as const;
 const borderRadius = { sm: 8, md: 12, lg: 16, xl: 20, full: 9999 } as const;
 
 const { width: SCREEN_WIDTH } = Dimensions.get('window');
-const TOTAL_STEPS = 10;
+const TOTAL_STEPS = 9;
 const CURRENT_STEP = 8; // 0-indexed: step 8 of 10
 
 const GRID_GAP = 12;

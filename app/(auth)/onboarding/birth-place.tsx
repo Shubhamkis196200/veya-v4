@@ -131,7 +131,7 @@ const borderRadius = {
 // ─────────────────────────────────────────────────────────────
 
 const { width: SCREEN_WIDTH, height: SCREEN_HEIGHT } = Dimensions.get('window');
-const TOTAL_STEPS = 10;
+const TOTAL_STEPS = 9;
 const CURRENT_STEP = 4; // 0-indexed: step 4 of 8 (5th dot)
 
 // ─────────────────────────────────────────────────────────────

@@ -188,7 +188,7 @@ const MOCK = {
   dayLabels: ['M', 'T', 'W', 'T', 'F', 'S', 'S'],
 
   morningRitual: {
-    status: 'ready' as const,
+    status: 'ready' as 'ready' | 'complete' | 'locked',
     intention: REAL_RITUAL.intention,
     affirmation: REAL_RITUAL.affirmation,
     energyForecast: REAL_RITUAL.energyForecast,
@@ -196,7 +196,7 @@ const MOCK = {
   },
 
   eveningRitual: {
-    status: 'ready' as const,
+    status: 'ready' as 'ready' | 'complete' | 'locked',
     availableAt: '7:00 PM',
     reflectionPrompt: 'What moment today made you feel most alive?',
     estimatedTime: '~2 min',

@@ -317,7 +317,7 @@ function generateAspectInterpretation(
   aspectType: string,
   transitSign: string,
 ): string {
-  const interpretations: Record<string, Record<string, Record<string, string>>> = {
+  const interpretations: Record<string, Record<string, Record<string, string> | string>> = {
     Conjunction: {
       Sun: {
         Sun: `Solar return energy — a day of renewed vitality and self-expression`,
@@ -377,8 +377,8 @@ function generateAspectInterpretation(
 
   // Try specific planet-to-planet interpretation
   const planetInterps = aspectInterps[transitPlanet];
-  if (planetInterps && planetInterps[natalPlanet]) {
-    return planetInterps[natalPlanet];
+  if (planetInterps && typeof planetInterps === 'object' && natalPlanet in planetInterps) {
+    return (planetInterps as Record<string, string>)[natalPlanet];
   }
 
   // Fall back to default for this aspect type

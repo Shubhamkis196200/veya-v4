@@ -77,7 +77,7 @@ function getSunSign(month?: number, day?: number): string | undefined {
   return undefined;
 }
 
-function buildUserProfile(data: ReturnType<typeof useOnboardingStore>['data']): UserProfile {
+function buildUserProfile(data: any): UserProfile {
   const now = new Date().toISOString();
   const precision = data.birthTimeKnown
     ? (data.birthTimePrecision === 'exact' || data.birthTimePrecision === 'approximate'

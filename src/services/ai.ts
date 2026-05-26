@@ -29,7 +29,6 @@ import type { JournalEntry } from '../stores/journalStore';
 
 // OpenAI calls now routed through our secure AWS backend
 const API_BASE = 'https://58to1i483l.execute-api.us-east-1.amazonaws.com';
-const OPENAI_API_KEY = ''; // No longer needed client-side
 const OPENAI_BASE = API_BASE; // All calls go through Lambda proxy
 
 const MODELS = {
@@ -159,7 +158,7 @@ function formatChartContext(profile: UserProfile, chart?: BirthChart | null): st
 
   if (chart?.aspects?.length) {
     lines.push('\nKey Natal Aspects:');
-    for (const aspect of (chart.aspects as any[]).slice(0, 10)) {
+    for (const aspect of (chart.aspects as unknown as any[]).slice(0, 10)) {
       lines.push(`  ${aspect.planet1} ${aspect.type} ${aspect.planet2} (orb ${aspect.orb.toFixed(1)}°)`);
     }
   }

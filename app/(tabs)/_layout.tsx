@@ -1,6 +1,7 @@
 import React from 'react';
 import { Tabs } from 'expo-router';
 import { Platform, Text, View, Pressable } from 'react-native';
+import { Ionicons } from '@expo/vector-icons';
 
 class TabsErrorBoundary extends React.Component<
   { children: React.ReactNode },
@@ -92,6 +93,7 @@ export default function TabLayout() {
           },
           tabBarLabelStyle: {
             fontSize: 10,
+            fontFamily: 'Inter-Medium',
           },
         }}
       >
@@ -99,35 +101,35 @@ export default function TabLayout() {
         name="index"
         options={{
           title: 'Today',
-          tabBarIcon: ({ color }) => <Text style={{ fontSize: 20 }}>☀️</Text>,
+          tabBarIcon: ({ color, size }) => <Ionicons name="sunny" size={size || 22} color={color} />,
         }}
       />
       <Tabs.Screen
         name="chat"
         options={{
           title: 'Chat',
-          tabBarIcon: ({ color }) => <Text style={{ fontSize: 20 }}>💬</Text>,
+          tabBarIcon: ({ color, size }) => <Ionicons name="chatbubble-ellipses" size={size || 22} color={color} />,
         }}
       />
       <Tabs.Screen
         name="explore"
         options={{
           title: 'Explore',
-          tabBarIcon: ({ color }) => <Text style={{ fontSize: 20 }}>🔮</Text>,
+          tabBarIcon: ({ color, size }) => <Ionicons name="compass" size={size || 22} color={color} />,
         }}
       />
       <Tabs.Screen
         name="rituals"
         options={{
           title: 'Rituals',
-          tabBarIcon: ({ color }) => <Text style={{ fontSize: 20 }}>🌙</Text>,
+          tabBarIcon: ({ color, size }) => <Ionicons name="moon" size={size || 22} color={color} />,
         }}
       />
       <Tabs.Screen
         name="profile"
         options={{
           title: 'You',
-          tabBarIcon: ({ color }) => <Text style={{ fontSize: 20 }}>👤</Text>,
+          tabBarIcon: ({ color, size }) => <Ionicons name="person-circle" size={size || 22} color={color} />,
         }}
       />
       </Tabs>

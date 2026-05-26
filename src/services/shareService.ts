@@ -23,10 +23,7 @@ export async function captureAndShare(
   viewRef: RefObject<ViewShot | null>,
 ): Promise<boolean> {
   try {
-    const uri = await viewRef.current?.capture?.({
-      format: 'png',
-      quality: 1,
-    });
+    const uri = await viewRef.current?.capture?.();
 
     if (!uri) return false;
 

@@ -179,7 +179,7 @@ export const useReadingStore = create<ReadingStore>()(
         set({
           todayReading: reading,
           error: null,
-          lastFetchDate: reading?.date || null,
+          lastFetchDate: reading?.reading_date || null,
         }),
 
       setLoading: (loading) => set({ isLoading: loading }),

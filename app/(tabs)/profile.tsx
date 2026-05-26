@@ -619,7 +619,7 @@ export default function ProfileScreen() {
 
   // Use onboarding store data with fallbacks
   const userName = data.name || 'Cosmic Soul';
-  const birthDate = data.birthDate;
+  const birthDate = data.birthDate ? String(data.birthDate) : null;
   const birthPlace = data.birthPlace || '';
   const focusAreas = data.focusAreas || [];
 

@@ -13,6 +13,7 @@ import {
   Modal,
   Alert,
 } from 'react-native';
+import Animated, { FadeInDown, FadeIn } from 'react-native-reanimated';
 import { StatusBar } from 'expo-status-bar';
 import { useSafeAreaInsets } from 'react-native-safe-area-context';
 import { LinearGradient } from 'expo-linear-gradient';
@@ -126,9 +127,12 @@ export default function TodayScreen() {
         <VoiceInterface onClose={() => setShowVoice(false)} />
       </Modal>
       <ScrollView contentContainerStyle={styles.content} showsVerticalScrollIndicator={false}>
-        <StreakCounter currentStreak={currentStreak} isLoading={streakLoading} />
+        <Animated.View entering={FadeInDown.delay(100).duration(600)}>
+          <StreakCounter currentStreak={currentStreak} isLoading={streakLoading} />
+        </Animated.View>
 
         {/* Talk to VEYa Card */}
+        <Animated.View entering={FadeInDown.delay(200).duration(600)}>
         <Pressable onPress={handleOpenVoice} style={({ pressed }) => [{ opacity: pressed ? 0.9 : 1 }]}>
           <LinearGradient
             colors={['#8B5CF6', '#6D28D9', '#5B21B6']}
@@ -146,9 +150,12 @@ export default function TodayScreen() {
             </View>
           </LinearGradient>
         </Pressable>
+        </Animated.View>
 
+        <Animated.View entering={FadeInDown.delay(300).duration(600)}>
         <Text style={styles.greeting}>{greeting}, {data?.name || 'Star Child'} ☉</Text>
         <Text style={styles.subtitle}>{dateDisplay} · {sunSign}</Text>
+        </Animated.View>
 
         {readingLoading && !r && (
           <View style={styles.loadingCard}>
