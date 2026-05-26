@@ -1,13 +1,12 @@
 // ============================================================================
-// VEYa Voice Service — Recording + Transcription + TTS
+// VEYa Voice Service — Recording + Transcription + TTS (AWS Backend)
 // ============================================================================
 
 import { Audio } from 'expo-av';
-import * as FileSystem from 'expo-file-system';
-import { Buffer } from 'buffer';
+import { cacheDirectory, EncodingType, readAsStringAsync, writeAsStringAsync } from 'expo-file-system/legacy';
+import AsyncStorage from '@react-native-async-storage/async-storage';
 
-const OPENAI_API_KEY = process.env.EXPO_PUBLIC_OPENAI_API_KEY || '';
-const OPENAI_BASE = 'https://api.openai.com/v1';
+const API_BASE = 'https://58to1i483l.execute-api.us-east-1.amazonaws.com';
 
 let currentSound: Audio.Sound | null = null;
 let isRecording = false;
@@ -52,39 +51,32 @@ export async function stopRecording(recording: Audio.Recording): Promise<string>
 }
 
 export async function transcribeAudio(audioUri: string): Promise<string> {
-  if (!OPENAI_API_KEY) {
-    throw new Error('Missing OpenAI API key');
-  }
-
   isTranscribing = true;
   try {
-    const formData = new FormData();
-    const name = audioUri.split('/').pop() || `recording-${Date.now()}.m4a`;
-    const ext = name.split('.').pop() || 'm4a';
-    const mime = ext === 'wav'
-      ? 'audio/wav'
-      : ext === 'mp3'
-        ? 'audio/mpeg'
-        : 'audio/m4a';
+    const token = await AsyncStorage.getItem('veya_auth_token');
 
-    formData.append('file', {
-      uri: audioUri,
-      name,
-      type: mime,
-    } as unknown as Blob);
-    formData.append('model', 'whisper-1');
+    // Read file as base64 and send to our backend
+    const base64Audio = await readAsStringAsync(audioUri, {
+      encoding: EncodingType.Base64,
+    });
 
-    const response = await fetch(`${OPENAI_BASE}/audio/transcriptions`, {
+    const filename = audioUri.split('/').pop() || `recording-${Date.now()}.m4a`;
+
+    const response = await fetch(`${API_BASE}/voice/transcribe`, {
       method: 'POST',
       headers: {
-        Authorization: `Bearer ${OPENAI_API_KEY}`,
+        'Content-Type': 'application/json',
+        'Authorization': `Bearer ${token || ''}`,
       },
-      body: formData,
+      body: JSON.stringify({
+        audio_base64: base64Audio,
+        filename,
+      }),
     });
 
     if (!response.ok) {
       const errorBody = await response.text().catch(() => 'Unknown error');
-      throw new Error(`Whisper API error ${response.status}: ${errorBody}`);
+      throw new Error(`Transcription error ${response.status}: ${errorBody}`);
     }
 
     const data = await response.json() as { text?: string };
@@ -94,11 +86,7 @@ export async function transcribeAudio(audioUri: string): Promise<string> {
   }
 }
 
-export async function speakText(text: string, language?: string): Promise<void> {
-  if (!OPENAI_API_KEY) {
-    throw new Error('Missing OpenAI API key');
-  }
-
+export async function speakText(text: string, _language?: string): Promise<void> {
   if (!text.trim()) return;
 
   isSpeaking = true;
@@ -115,33 +103,29 @@ export async function speakText(text: string, language?: string): Promise<void> 
       playsInSilentModeIOS: true,
     });
 
-    // OpenAI TTS auto-detects language from text content
-    // "nova" voice works well across all supported languages
-    const response = await fetch(`${OPENAI_BASE}/audio/speech`, {
+    const token = await AsyncStorage.getItem('veya_auth_token');
+
+    // Call our TTS endpoint which returns base64 audio
+    const response = await fetch(`${API_BASE}/voice/tts`, {
       method: 'POST',
       headers: {
         'Content-Type': 'application/json',
-        Authorization: `Bearer ${OPENAI_API_KEY}`,
+        'Authorization': `Bearer ${token || ''}`,
       },
-      body: JSON.stringify({
-        model: 'tts-1-hd',
-        voice: 'nova',
-        input: text,
-        format: 'mp3',
-        speed: 1.0,
-      }),
+      body: JSON.stringify({ text, voice: 'nova' }),
     });
 
     if (!response.ok) {
       const errorBody = await response.text().catch(() => 'Unknown error');
-      throw new Error(`OpenAI TTS error ${response.status}: ${errorBody}`);
+      throw new Error(`TTS error ${response.status}: ${errorBody}`);
     }
 
-    const arrayBuffer = await response.arrayBuffer();
-    const base64Audio = Buffer.from(arrayBuffer).toString('base64');
-    const fileUri = `${FileSystem.cacheDirectory}veya_tts_${Date.now()}.mp3`;
-    await FileSystem.writeAsStringAsync(fileUri, base64Audio, {
-      encoding: FileSystem.EncodingType.Base64,
+    const data = await response.json() as { audio_base64: string; format: string };
+
+    // Save to file and play
+    const fileUri = `${cacheDirectory}veya_tts_${Date.now()}.mp3`;
+    await writeAsStringAsync(fileUri, data.audio_base64, {
+      encoding: EncodingType.Base64,
     });
 
     const { sound } = await Audio.Sound.createAsync({ uri: fileUri }, { shouldPlay: true });

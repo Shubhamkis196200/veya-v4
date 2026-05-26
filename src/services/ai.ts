@@ -3,6 +3,7 @@
 // ============================================================================
 
 import { supabase } from '../lib/supabase';
+import AsyncStorage from '@react-native-async-storage/async-storage';
 import {
   VEYA_SYSTEM_PROMPT,
   DAILY_READING_PROMPT,
@@ -26,10 +27,10 @@ import type { JournalEntry } from '../stores/journalStore';
 // Config
 // ---------------------------------------------------------------------------
 
-const OPENAI_API_KEY =
-  process.env.EXPO_PUBLIC_OPENAI_API_KEY || '';
-
-const OPENAI_BASE = 'https://api.openai.com/v1';
+// OpenAI calls now routed through our secure AWS backend
+const API_BASE = 'https://58to1i483l.execute-api.us-east-1.amazonaws.com';
+const OPENAI_API_KEY = ''; // No longer needed client-side
+const OPENAI_BASE = API_BASE; // All calls go through Lambda proxy
 
 const MODELS = {
   premium: 'gpt-4o',
@@ -101,13 +102,14 @@ async function openAIFetch<T>(
   body: Record<string, unknown>,
   timeoutMs: number = REQUEST_TIMEOUT,
 ): Promise<T> {
-  const response = await fetch(`${OPENAI_BASE}${path}`, {
+  const token = await AsyncStorage.getItem('veya_auth_token');
+  const response = await fetch(`${API_BASE}/ai/generate`, {
     method: 'POST',
     headers: {
       'Content-Type': 'application/json',
-      Authorization: `Bearer ${OPENAI_API_KEY}`,
+      'Authorization': `Bearer ${token || ''}`,
     },
-    body: JSON.stringify(body),
+    body: JSON.stringify({ messages: body.messages, model: body.model, max_tokens: body.max_tokens, temperature: body.temperature }),
     signal: buildAbortSignal(timeoutMs),
   });
 
